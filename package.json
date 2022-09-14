@@ -1,0 +1,12 @@
+{
+  "name": "looker-gcp-auth-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/4mile/looker-gcp-auth-service.git",
+  "author": "danchapman <dan@4mile.io>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
