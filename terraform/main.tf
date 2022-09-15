@@ -65,9 +65,9 @@ resource "google_cloud_run_service" "looker_gcp_auth_service" {
   template {
     spec {
       containers {
-        # image = "us-docker.pkg.dev/cloudrun/container/hello:latest"
         image = "gcr.io/${var.project}/${var.service}:${var.app_version}"
       }
+      service_account_name = google_service_account.looker_gcp_auth_service_account.email
     }
   }
 
