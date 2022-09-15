@@ -67,7 +67,6 @@ resource "google_cloud_run_service" "looker_gcp_auth_service" {
       containers {
         image = "gcr.io/${var.project}/${var.service}:${var.app_version}"
       }
-      service_account_name = google_service_account.looker_gcp_auth_service_account.email
     }
   }
 
