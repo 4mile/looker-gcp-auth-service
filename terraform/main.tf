@@ -11,7 +11,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "3.5.0"
+      version = "~> 3.66"
     }
   }
 }
@@ -27,15 +27,19 @@ provider "google" {
 }
 
 # This turns on the cloud run api in GCP
-resource "google_project_service" "run_api" {
-  service = "run.googleapis.com"
-
-  disable_on_destroy = true
-}
-
 resource "google_project_service" "iam_api" {
   service            = "iam.googleapis.com"
   disable_on_destroy = false
+}
+
+resource "google_project_service" "cloudresourcemanager" {
+  service            = "cloudresourcemanager.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "run_api" {
+  service = "run.googleapis.com"
+  disable_on_destroy = true
 }
 
 resource "google_project_service" "cloudbuild" {
