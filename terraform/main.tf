@@ -65,8 +65,8 @@ resource "google_cloud_run_service" "looker_gcp_auth_service" {
   template {
     spec {
       containers {
-        image = "us-docker.pkg.dev/cloudrun/container/hello:latest"
-        # image = "gcr.io/${var.project}/${var.service}:${var.app_version}"
+        # image = "us-docker.pkg.dev/cloudrun/container/hello:latest"
+        image = "gcr.io/${var.project}/${var.service}:${var.app_version}"
       }
     }
   }
@@ -125,7 +125,15 @@ resource "google_cloudbuild_trigger" "deploy_main" {
     step {
       id   = "docker build"
       name = "gcr.io/cloud-builders/docker"
-      args = ["build", "-t", local.image_name_versioned, "-t", local.image_name_latest, "."]
+      args = [
+        "build",
+        "-t",
+        local.image_name_versioned,
+        "-t",
+        local.image_name_latest,
+        ".",
+        "--build-arg", "BUILDKIT_INLINE_CACHE=1"
+      ]
     }
 
     step {
@@ -161,6 +169,8 @@ resource "google_cloudbuild_trigger" "deploy_main" {
       args = ["apply", "-var", "project=$PROJECT_ID", "-var", "app_version=$SHORT_SHA", "-auto-approve"]
     }
 
-    # note that collectstatic is run at build time in the container
+    options {
+      env = ["DOCKER_BUILDKIT=1"]
+    }
   }
 }
