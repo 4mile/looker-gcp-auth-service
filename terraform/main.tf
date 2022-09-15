@@ -65,7 +65,8 @@ resource "google_cloud_run_service" "looker_gcp_auth_service" {
   template {
     spec {
       containers {
-        image = "gcr.io/${var.project}/${var.service}:${var.app_version}"
+        image = "us-docker.pkg.dev/cloudrun/container/hello:latest"
+        # image = "gcr.io/${var.project}/${var.service}:${var.app_version}"
       }
     }
   }
@@ -98,7 +99,7 @@ resource "google_service_account" "looker_gcp_auth_service_account" {
   display_name = "Looker GCP Auth Service Account"
 
    # Waits for the Cloud Run API to be enabled
-  depends_on = [google_project_service.iam_api]
+  depends_on = [google_project_service.iam_api, google_cloud_run_service.looker_gcp_auth_service]
 }
 
 # Binds service account to the required roles needed
