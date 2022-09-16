@@ -90,7 +90,7 @@ resource "google_cloud_run_service" "looker_gcp_auth_service" {
   }
 
   # Waits for the Cloud Run API to be enabled
-  depends_on = [google_project_service.run_api, google_service_account.looker_gcp_auth_service_account]
+  depends_on = [google_project_service.run_api, google_service_account.looker_gcp_auth_service_account, google_project_iam_binding.access_services]
 }
 
 # Create public access for our cloud run service
