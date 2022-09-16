@@ -70,7 +70,8 @@ resource "google_service_account" "looker_gcp_auth_service_account" {
 resource "google_project_iam_binding" "access_services" {
   for_each = toset([
     "run.admin",
-    "iam.serviceAccountAdmin"
+    "iam.serviceAccountAdmin",
+    "storage.admin"
   ])
 
   role    = "roles/${each.key}"
