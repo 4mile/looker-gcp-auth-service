@@ -68,8 +68,12 @@ resource "google_service_account" "looker_gcp_auth_service_account" {
 
 # Binds service account to the required roles needed
 resource "google_project_iam_binding" "access_services" {
-  project = var.project
-  role    = "roles/iam.serviceAccountAdmin"
+  for_each = toset([
+    "run.admin",
+    "roles/iam.serviceAccountAdmin"
+  ])
+
+  role    = "roles/${each.key}"
   members = [
     "serviceAccount:${google_service_account.looker_gcp_auth_service_account.email}"
   ]
@@ -115,7 +119,7 @@ resource "google_cloudbuild_trigger" "deploy_main" {
   github {
     owner = "4mile"
     name  = "looker-gcp-auth-service"
-    
+
     push {
       branch = "main"
     }
