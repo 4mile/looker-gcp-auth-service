@@ -57,6 +57,24 @@ resource "google_project_service" "secretmanager" {
   disable_on_destroy = false
 }
 
+# Creates a service account that will grant the access token
+resource "google_service_account" "looker_gcp_auth_service_account" {
+  account_id   = "looker-gcp-auth"
+  display_name = "Looker GCP Auth Service Account"
+
+   # Waits for the Cloud Run API to be enabled
+  depends_on = [google_project_service.iam_api]
+}
+
+# Binds service account to the required roles needed
+resource "google_project_iam_binding" "access_services" {
+  project = var.project
+  role    = "roles/editor"
+  members = [
+    "serviceAccount:${google_service_account.looker_gcp_auth_service_account.email}"
+  ]
+}
+
 # This creates our Cloud Run service
 resource "google_cloud_run_service" "looker_gcp_auth_service" {
   name = "looker-gcp-auth-service"
@@ -64,6 +82,7 @@ resource "google_cloud_run_service" "looker_gcp_auth_service" {
 
   template {
     spec {
+      service_account_name = google_service_account.looker_gcp_auth_service_account.email
       containers {
         image = "gcr.io/${var.project}/${var.service}:${var.app_version}"
       }
@@ -90,24 +109,6 @@ resource "google_cloud_run_service_iam_policy" "noauth" {
   project     = var.project
   service     = google_cloud_run_service.looker_gcp_auth_service.name
   policy_data = data.google_iam_policy.noauth.policy_data
-}
-
-# Creates a service account that will grant the access token
-resource "google_service_account" "looker_gcp_auth_service_account" {
-  account_id   = "looker-gcp-auth"
-  display_name = "Looker GCP Auth Service Account"
-
-   # Waits for the Cloud Run API to be enabled
-  depends_on = [google_project_service.iam_api, google_cloud_run_service.looker_gcp_auth_service]
-}
-
-# Binds service account to the required roles needed
-resource "google_project_iam_binding" "access_services" {
-  project = var.project
-  role    = "roles/editor"
-  members = [
-    "serviceAccount:${google_service_account.looker_gcp_auth_service_account.email}"
-  ]
 }
 
 resource "google_cloudbuild_trigger" "deploy_main" {
