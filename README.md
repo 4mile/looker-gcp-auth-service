@@ -37,7 +37,4 @@ TODOS:
 
 
 ####### TODO
-- add github credentials
 - fix terraform 
-- talk to Eric
-  - order of operations on deployment
