@@ -1,6 +1,7 @@
 
 locals {
   # note that $PROJECT_ID and $SHORT_SHA are substituted by the cloud build environment
+  cloudbuild_serviceaccount = "serviceAccount:$PROJECT_ID@cloudbuild.gserviceaccount.com"
   image_name           = "gcr.io/$PROJECT_ID/${var.service}"
   image_name_versioned = "${local.image_name}:$SHORT_SHA"
   image_name_latest    = "${local.image_name}:latest"
@@ -38,7 +39,7 @@ resource "google_project_service" "cloudresourcemanager" {
 }
 
 resource "google_project_service" "run_api" {
-  service = "run.googleapis.com"
+  service            = "run.googleapis.com"
   disable_on_destroy = true
 }
 
@@ -57,6 +58,21 @@ resource "google_project_service" "secretmanager" {
   disable_on_destroy = false
 }
 
+# Gives Cloudbuild the proper permissions
+resource "google_project_iam_binding" "cloudbuild_service_permissions" {
+  for_each = toset([
+    "run.admin",
+    "iam.roleAdmin",
+    "iam.serviceAccountAdmin",
+    "resourcemanager.projectIamAdmin",
+    "run.developer",
+    "storage.admin"
+  ])
+
+  role    = "roles/${each.key}"
+  members = [local.cloudbuild_serviceaccount]
+}
+
 # Creates a service account that will grant the access token
 resource "google_service_account" "looker_gcp_auth_service_account" {
   account_id   = "looker-gcp-auth"
@@ -71,7 +87,8 @@ resource "google_project_iam_binding" "access_services" {
   for_each = toset([
     "run.admin",
     "iam.serviceAccountAdmin",
-    "storage.admin"
+    "storage.admin",
+    "run.developer"
   ])
 
   role    = "roles/${each.key}"
