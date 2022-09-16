@@ -69,7 +69,7 @@ resource "google_service_account" "looker_gcp_auth_service_account" {
 # Binds service account to the required roles needed
 resource "google_project_iam_binding" "access_services" {
   project = var.project
-  role    = "roles/editor"
+  role    = "roles/iam.serviceAccountUser"
   members = [
     "serviceAccount:${google_service_account.looker_gcp_auth_service_account.email}"
   ]
