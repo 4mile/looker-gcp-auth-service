@@ -115,6 +115,7 @@ resource "google_cloudbuild_trigger" "deploy_main" {
   github {
     owner = "4mile"
     name  = "looker-gcp-auth-service"
+    
     push {
       branch = "main"
     }
