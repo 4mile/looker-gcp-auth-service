@@ -1,7 +1,7 @@
 
 locals {
   # note that $PROJECT_ID and $SHORT_SHA are substituted by the cloud build environment
-  cloudbuild_serviceaccount = "serviceAccount:$PROJECT_ID@cloudbuild.gserviceaccount.com"
+  cloudbuild_serviceaccount = "serviceAccount:${var.project_number}@cloudbuild.gserviceaccount.com"
   image_name           = "gcr.io/$PROJECT_ID/${var.service}"
   image_name_versioned = "${local.image_name}:$SHORT_SHA"
   image_name_latest    = "${local.image_name}:latest"
