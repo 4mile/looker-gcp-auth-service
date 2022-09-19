@@ -150,10 +150,11 @@ resource "google_cloudbuild_trigger" "deploy_main" {
       name = "gcr.io/cloud-builders/docker"
       args = [
         "build",
-        "-t",
-        local.image_name_versioned,
-        "-t",
-        local.image_name_latest,
+        "--build-arg", "LOOKERSDK_BASE_URL=${var.lookersdk_base_url}",
+        "--build-arg", "SERVER_PORT=8080",
+        "--build-arg", "SERVICE_ACCOUNT_EMAIL=${google_service_account.looker_gcp_auth_service_account.email}",
+        "-t", local.image_name_versioned,
+        "-t", local.image_name_latest,
         ".",
         "--build-arg", "BUILDKIT_INLINE_CACHE=1"
       ]
